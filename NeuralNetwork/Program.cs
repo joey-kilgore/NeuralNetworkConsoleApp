@@ -11,16 +11,17 @@ namespace NeuralNetwork
         static void Main(string[] args)
         {
             List<int> networkNodeList = new List<int>() { 1, 50, 50, 1 };
-            Network network = new Network(networkNodeList);
+            //Network network = new Network(networkNodeList);
+            Network network = FileIO.inputNetwork(@"C:\Users\joeya\Desktop\Neural Network\testOutputNet.csv");
 
             double[] finalNeurons = network.calcOutput(new double[] { .8 });
             Console.WriteLine("TEST ORIGINAL VALUE : " + finalNeurons[0]);
             //network.rawOutput();
 
 
-            Console.WriteLine("TRY UPDATE");
-            sinTest(network);
-
+            //Console.WriteLine("TRY UPDATE");
+            //sinTest(network);
+            //FileIO.outputNetwork(@"C:\Users\joeya\Desktop\Neural Network\testOutputNet.csv", network);
             Console.Read();
         }
 
@@ -30,13 +31,14 @@ namespace NeuralNetwork
             List<double[]> inputStuff = FileIO.readInputFromFile(@"C: \Users\joeya\Desktop\Neural Network\sinInput.csv");
             List<double[]> outputStuff = FileIO.readInputFromFile(@"C: \Users\joeya\Desktop\Neural Network\sinOutput.csv");
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 10; i++)
             {
                 network.train(inputStuff, outputStuff, .5, 1000);
 
                 finalNeurons = network.calcOutput(new double[] { .8 });
                 Console.WriteLine("TEST " + i + " VALUE : " + finalNeurons[0]);
             }
+            FileIO.outputNetwork(@"C:\Users\joeya\Desktop\Neural Network\testOutputNet.csv", network);
             Console.ReadLine();
         }
     }

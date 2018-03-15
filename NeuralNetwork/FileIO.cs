@@ -50,6 +50,7 @@ namespace NeuralNetwork
             {
                 temp += l.neuron.Length.ToString() + ",";
             }
+            temp = temp.TrimEnd(',');
             writer.WriteLine(temp); //writes the first line with the list of nodes per layer
 
             for (int lNum = 1; lNum < n.layers.Count; lNum++)    //loop through each layer starting with hidden
@@ -60,6 +61,7 @@ namespace NeuralNetwork
                 {
                     temp += b.ToString() + ",";
                 }
+                temp = temp.TrimEnd(',');
                 writer.WriteLine(temp); //write to file
 
                 for (int i = 0; i < l.weight.GetLength(0); i++)  //loop through first index of weight
@@ -69,6 +71,7 @@ namespace NeuralNetwork
                     {
                         temp += l.weight[i, j].ToString() + ",";
                     }
+                    temp = temp.TrimEnd(',');
                     writer.WriteLine(temp); //write weight to file
                 }
             }
@@ -97,7 +100,7 @@ namespace NeuralNetwork
                 for (int i = 0; i < n.layers[layerNum].weight.GetLength(0); i++) //loop through each first index of weight
                 {
                     double[] temp1 = Array.ConvertAll(reader.ReadLine().Split(','), Double.Parse);  //read line for that first index
-                    for (int j = 0; j < n.layers[layerNum].weight.GetLength(0); j++)    //loop through second index
+                    for (int j = 0; j < n.layers[layerNum].weight.GetLength(1); j++)    //loop through second index
                     {
                         n.layers[layerNum].weight[i, j] = temp1[j]; //set corresponding value based on input
                     }
