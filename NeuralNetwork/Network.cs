@@ -84,63 +84,7 @@ namespace NeuralNetwork
             {
                 layers[i].activDerivZ = NetworkMath.activationFunctionDeriv(layers[i].z);
             }
-        }
-
-        public void updateWeightsAndBiases(double rate, double numTests)
-        {
-            for (int layerNum = 1; layerNum < layers.Count; layerNum++)    //loops through each layers starting with the first hidden layer
-            {   //WEIGHT UPDATE
-                double[,] sumWeight = new double[layers[layerNum].derivWeight[0].GetLength(0), layers[layerNum].derivWeight[0].GetLength(1)]; //holds sum for the weight derivatives
-
-                for (int i = 0; i < sumWeight.GetLength(0); i++)   //this goes through the first index
-                {
-                    for (int j = 0; j < sumWeight.GetLength(1); j++)   //this goes throguh the second index
-                    {
-                        sumWeight[i, j] = 0;  //sets every value to zero
-                    }
-                }
-
-                foreach (double[,] d in layers[layerNum].derivWeight)   //loops through each derivative in the list and adds it to the sum
-                {
-                    sumWeight = NetworkMath.add(sumWeight, d);  //adds the derivatives to the sum
-                }
-
-                for (int i = 0; i < sumWeight.GetLength(0); i++)   //this goes through the first index
-                {
-                    for (int j = 0; j < sumWeight.GetLength(1); j++)   //this goes throguh the second index
-                    {
-                        sumWeight[i, j] /= numTests; //divides the sum by number of tests to calc average
-
-                        layers[layerNum].weight[i, j] -= sumWeight[i, j] * rate;  //the actual update of each weight
-                    }
-                }
-
-                //BIAS UPDATE
-                double[] sumBias = new double[layers[layerNum].derivBias[0].GetLength(0)];  //creates a sum array for the bias derivatives
-
-                for (int i = 0; i < sumBias.Length; i++)     //loops through the bias sum array
-                {
-                    sumBias[i] = 0; //sets every element in the array to zero
-                }
-
-                foreach (double[] d in layers[layerNum].derivBias)   //loops through all the derivatives from every test
-                {
-                    sumBias = NetworkMath.add(sumBias, d);  //adds the derivatives to the sum
-                }
-
-                for (int i = 0; i < sumBias.Length; i++) //loops through each element of the sum array
-                {
-                    sumBias[i] /= numTests; //divides the sum by the number of tests to calculate the average
-
-                    layers[layerNum].bias[i] -= sumBias[i] * rate;  //the actual update of each bias
-                }
-
-
-                layers[layerNum].derivWeight.Clear(); //removes the list of derivatives used in this update
-                layers[layerNum].derivBias.Clear();
-                layers[layerNum].derivNeuron.Clear();
-            }
-        }
+        }     
 
         public void calcNeuronDeriv(double[] output)
         {
@@ -210,6 +154,61 @@ namespace NeuralNetwork
             }
         }
 
+        public void updateWeightsAndBiases(double rate, double numTests)
+        {
+            for (int layerNum = 1; layerNum < layers.Count; layerNum++)    //loops through each layers starting with the first hidden layer
+            {   //WEIGHT UPDATE
+                double[,] sumWeight = new double[layers[layerNum].derivWeight[0].GetLength(0), layers[layerNum].derivWeight[0].GetLength(1)]; //holds sum for the weight derivatives
+
+                for (int i = 0; i < sumWeight.GetLength(0); i++)   //this goes through the first index
+                {
+                    for (int j = 0; j < sumWeight.GetLength(1); j++)   //this goes throguh the second index
+                    {
+                        sumWeight[i, j] = 0;  //sets every value to zero
+                    }
+                }
+
+                foreach (double[,] d in layers[layerNum].derivWeight)   //loops through each derivative in the list and adds it to the sum
+                {
+                    sumWeight = NetworkMath.add(sumWeight, d);  //adds the derivatives to the sum
+                }
+
+                for (int i = 0; i < sumWeight.GetLength(0); i++)   //this goes through the first index
+                {
+                    for (int j = 0; j < sumWeight.GetLength(1); j++)   //this goes throguh the second index
+                    {
+                        sumWeight[i, j] /= numTests; //divides the sum by number of tests to calc average
+
+                        layers[layerNum].weight[i, j] -= sumWeight[i, j] * rate;  //the actual update of each weight
+                    }
+                }
+
+                //BIAS UPDATE
+                double[] sumBias = new double[layers[layerNum].derivBias[0].GetLength(0)];  //creates a sum array for the bias derivatives
+
+                for (int i = 0; i < sumBias.Length; i++)     //loops through the bias sum array
+                {
+                    sumBias[i] = 0; //sets every element in the array to zero
+                }
+
+                foreach (double[] d in layers[layerNum].derivBias)   //loops through all the derivatives from every test
+                {
+                    sumBias = NetworkMath.add(sumBias, d);  //adds the derivatives to the sum
+                }
+
+                for (int i = 0; i < sumBias.Length; i++) //loops through each element of the sum array
+                {
+                    sumBias[i] /= numTests; //divides the sum by the number of tests to calculate the average
+
+                    layers[layerNum].bias[i] -= sumBias[i] * rate;  //the actual update of each bias
+                }
+
+
+                layers[layerNum].derivWeight.Clear(); //removes the list of derivatives used in this update
+                layers[layerNum].derivBias.Clear();
+                layers[layerNum].derivNeuron.Clear();
+            }
+        }
 
         /// <summary>
         /// calculates the value for all neurons in the network

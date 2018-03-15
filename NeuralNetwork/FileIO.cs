@@ -76,6 +76,11 @@ namespace NeuralNetwork
             writer.Close();
         }
 
+        /// <summary>
+        /// read file and load pregenerated neural network
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         public static Network inputNetwork(string filePath)
         {
             StreamReader reader = new StreamReader(filePath);

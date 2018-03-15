@@ -61,11 +61,21 @@ namespace NeuralNetwork
             return temp;
         }
 
+        /// <summary>
+        /// required to calculated the value of a neuron
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public static double activationFunctionDeriv(double a)
         {
             return (Math.Exp(a)) / Math.Pow((1.0 + Math.Exp(a)), 2.0);
         }
 
+        /// <summary>
+        /// required to calculate the values during back propogation
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public static double[] activationFunctionDeriv(double[] a)
         {
             double[] temp = new double[a.Length];
