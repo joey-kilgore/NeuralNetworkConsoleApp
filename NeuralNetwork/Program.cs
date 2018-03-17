@@ -20,20 +20,20 @@ namespace NeuralNetwork
 
 
             //Console.WriteLine("TRY UPDATE");
-            //sinTest(network);
-            //FileIO.outputNetwork(@"C:\Users\joeya\Desktop\Neural Network\testOutputNet.csv", network);
+            sinTest(network);
+            FileIO.outputNetwork(@"C:\Users\joeya\Desktop\Neural Network\testOutputNet.csv", network);
             Console.Read();
         }
 
         public static void sinTest(Network network)
         {
             double[] finalNeurons;
-            List<double[]> inputStuff = FileIO.readInputFromFile(@"C: \Users\joeya\Desktop\Neural Network\sinInput.csv");
-            List<double[]> outputStuff = FileIO.readInputFromFile(@"C: \Users\joeya\Desktop\Neural Network\sinOutput.csv");
+            List<double[]> inputStuff = FileIO.readInputFromFile(@"C: \Users\joeya\Desktop\Neural Network\sinInput1000.csv");
+            List<double[]> outputStuff = FileIO.readInputFromFile(@"C: \Users\joeya\Desktop\Neural Network\sinOutput1000.csv");
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 100; i++)
             {
-                network.train(inputStuff, outputStuff, .5, 1000);
+                network.train(inputStuff, outputStuff, .5, 100);
 
                 finalNeurons = network.calcOutput(new double[] { .8 });
                 Console.WriteLine("TEST " + i + " VALUE : " + finalNeurons[0]);

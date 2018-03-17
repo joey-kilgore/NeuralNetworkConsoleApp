@@ -8,7 +8,7 @@ namespace NeuralNetwork
 {
     public class NetworkMath
     {
-        public static double[] multiply(double[,] a, double[] b)    //2d matrix times a 1d matrix
+        public double[] multiply(double[,] a, double[] b)    //2d matrix times a 1d matrix
         {
             double[] c = new double[a.Length];  //instantiates the correct size of the product matrix
 
@@ -25,7 +25,7 @@ namespace NeuralNetwork
             return c;
         }
 
-        public static double[] add(double[] a, double[] b)  //add 2 1d matrices
+        public double[] add(double[] a, double[] b)  //add 2 1d matrices
         {
             double[] c = new double[a.Length];  //instantiates the correct size of the summation matrix
 
@@ -37,7 +37,7 @@ namespace NeuralNetwork
             return c;
         }
 
-        public static double[,] add(double[,] a, double[,] b)
+        public double[,] add(double[,] a, double[,] b)
         {
             double[,] c = new double[a.GetLength(0), a.GetLength(1)];
             for (int i = 0; i < a.GetLength(0); i++)
@@ -50,7 +50,7 @@ namespace NeuralNetwork
             return c;
         }
 
-        public static double[] activationFunction(double[] a)   //applies activation function to each element
+        public double[] activationFunction(double[] a)   //applies activation function to each element
         {
             double[] temp = new double[a.Length];
             for (int i = 0; i < (a.Length); i++)
@@ -66,7 +66,7 @@ namespace NeuralNetwork
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
-        public static double activationFunctionDeriv(double a)
+        public double activationFunctionDeriv(double a)
         {
             return (Math.Exp(a)) / Math.Pow((1.0 + Math.Exp(a)), 2.0);
         }
@@ -76,7 +76,7 @@ namespace NeuralNetwork
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
-        public static double[] activationFunctionDeriv(double[] a)
+        public double[] activationFunctionDeriv(double[] a)
         {
             double[] temp = new double[a.Length];
             for (int i = 0; i < a.Length; i++)

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace NeuralNetwork
 {
     public class Network
     {
+        public NetworkMath math = new NetworkMath();
         public List<Layer> layers = new List<Layer>();
 
         public Network(List<int> numNodes)
@@ -74,15 +76,21 @@ namespace NeuralNetwork
             calcNetwork(input);
             calcActivDerivZ();
             calcNeuronDeriv(output);
-            calcWeightDeriv();
-            calcBiasDeriv();
+            Thread weightThread = new Thread(calcWeightDeriv);
+            Thread biasThread = new Thread(calcBiasDeriv);
+            weightThread.Start();
+            biasThread.Start();
+            weightThread.Join();
+            biasThread.Join();
+            weightThread.Abort();
+            biasThread.Abort();
         }
 
         public void calcActivDerivZ()
         {
             for (int i = 1; i < layers.Count; i++)
             {
-                layers[i].activDerivZ = NetworkMath.activationFunctionDeriv(layers[i].z);
+                layers[i].activDerivZ = math.activationFunctionDeriv(layers[i].z);
             }
         }     
 
@@ -120,22 +128,36 @@ namespace NeuralNetwork
 
         public void calcWeightDeriv()
         {
-            for (int layerNum = layers.Count - 1; layerNum > 0; layerNum--)    //loop through each layer backwards 'Back propogation'
+            Thread[] threadArrayWeights = new Thread[layers.Count - 1];
+            for (int layerNum = 1 ; layerNum < layers.Count; layerNum++)    //loop through each layer backwards 'Back propogation'
             {
-                double[,] tempDeriv = new double[layers[layerNum].weight.GetLength(0), layers[layerNum].weight.GetLength(1)];   //create temporary 2d array for the derivatives
-
-                for (int curIndex = 0; curIndex < layers[layerNum].weight.GetLength(0); curIndex++)    //loops through all the weights from their current layer index
-                {
-                    for (int preIndex = 0; preIndex < layers[layerNum].weight.GetLength(1); preIndex++) //loops through all the weights from their previous layer index
-                    {
-                        tempDeriv[curIndex, preIndex] = (layers[layerNum - 1].neuron[preIndex] *
-                            layers[layerNum].activDerivZ[curIndex] *
-                            layers[layerNum].derivNeuron[layers[layerNum].derivNeuron.Count - 1][curIndex]);    //does the calculation for a specific neuron
-                    }
-                }
-
-                layers[layerNum].derivWeight.Add(tempDeriv);    //adds deriv array to current layers list of deriv arrays
+                int temp = layerNum;
+                threadArrayWeights[layerNum - 1] = new Thread(() => calcLayerWeightDeriv(temp));
+                threadArrayWeights[layerNum - 1].Start();
             }
+
+            for(int i=0; i<threadArrayWeights.Length; i++)
+            {
+                threadArrayWeights[i].Join();
+                threadArrayWeights[i].Abort();
+            }
+        }
+
+        public void calcLayerWeightDeriv(int curLayer)
+        {
+            double[,] tempDeriv = new double[layers[curLayer].weight.GetLength(0), layers[curLayer].weight.GetLength(1)];   //create temporary 2d array for the derivatives
+
+            for (int curIndex = 0; curIndex < layers[curLayer].weight.GetLength(0); curIndex++)    //loops through all the weights from their current layer index
+            {
+                for (int preIndex = 0; preIndex < layers[curLayer].weight.GetLength(1); preIndex++) //loops through all the weights from their previous layer index
+                {
+                    tempDeriv[curIndex, preIndex] = (layers[curLayer-1].neuron[preIndex] *
+                        layers[curLayer].activDerivZ[curIndex] *
+                        layers[curLayer].derivNeuron[layers[curLayer].derivNeuron.Count - 1][curIndex]);    //does the calculation for a specific neuron
+                }
+            }
+
+            layers[curLayer].derivWeight.Add(tempDeriv);    //adds deriv array to current layers list of deriv arrays
         }
 
         public void calcBiasDeriv()
@@ -170,7 +192,7 @@ namespace NeuralNetwork
 
                 foreach (double[,] d in layers[layerNum].derivWeight)   //loops through each derivative in the list and adds it to the sum
                 {
-                    sumWeight = NetworkMath.add(sumWeight, d);  //adds the derivatives to the sum
+                    sumWeight = math.add(sumWeight, d);  //adds the derivatives to the sum
                 }
 
                 for (int i = 0; i < sumWeight.GetLength(0); i++)   //this goes through the first index
@@ -193,7 +215,7 @@ namespace NeuralNetwork
 
                 foreach (double[] d in layers[layerNum].derivBias)   //loops through all the derivatives from every test
                 {
-                    sumBias = NetworkMath.add(sumBias, d);  //adds the derivatives to the sum
+                    sumBias = math.add(sumBias, d);  //adds the derivatives to the sum
                 }
 
                 for (int i = 0; i < sumBias.Length; i++) //loops through each element of the sum array
@@ -234,11 +256,11 @@ namespace NeuralNetwork
             for (int i = 1; i < (layers.Count); i++)   //loops through each layer (starting with the first hidden layer)
             {
                 //calcLayer(layers[i - 1], layers[i]);
-                double[] temp = NetworkMath.multiply(layers[i].weight, layers[i - 1].neuron); //multiplies the weights and the value of the previous layers neurons
+                double[] temp = math.multiply(layers[i].weight, layers[i - 1].neuron); //multiplies the weights and the value of the previous layers neurons
 
-                layers[i].z = NetworkMath.add(layers[i].bias, temp);   //adds the appropriate biases to the product of the weights and neurons
+                layers[i].z = math.add(layers[i].bias, temp);   //adds the appropriate biases to the product of the weights and neurons
 
-                layers[i].neuron = NetworkMath.activationFunction(layers[i].z);    //applies an activation function on the previous sum            
+                layers[i].neuron = math.activationFunction(layers[i].z);    //applies an activation function on the previous sum            
             }
         }
 
@@ -249,11 +271,11 @@ namespace NeuralNetwork
         /// <param name="curLayer"></param>
         public void calcLayer(Layer preLayer, Layer curLayer)
         {
-            double[] temp = NetworkMath.multiply(curLayer.weight, preLayer.neuron); //multiplies the weights and the value of the previous layers neurons
+            double[] temp = math.multiply(curLayer.weight, preLayer.neuron); //multiplies the weights and the value of the previous layers neurons
 
-            curLayer.z = NetworkMath.add(curLayer.bias, temp);   //adds the appropriate biases to the product of the weights and neurons
+            curLayer.z = math.add(curLayer.bias, temp);   //adds the appropriate biases to the product of the weights and neurons
 
-            curLayer.neuron = NetworkMath.activationFunction(curLayer.z);    //applies an activation function on the previous sum            
+            curLayer.neuron = math.activationFunction(curLayer.z);    //applies an activation function on the previous sum            
         }
 
         /// <summary>
